@@ -33,8 +33,8 @@ jobs:
       - name: Check for required keyword 'version'
         run: |
           # Use 'grep -q' to quietly search for the keyword 'version'
-          if ! grep -q "lela star ass" Hello.txt; then
-            echo "::error::The required keyword 'version' is missing from Hello.txt!"
+          if ! grep -q "Mars" Hello.txt; then
+            echo "::error::The required keyword 'Mars' is missing from Hello.txt!"
             exit 1 
           fi
           echo "Content check passed. 'version' keyword found."
