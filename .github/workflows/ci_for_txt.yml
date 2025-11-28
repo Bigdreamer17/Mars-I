@@ -1,0 +1,54 @@
+name: Simple Text File CI/CD 🚀
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # CI STAGE 1: CHECK FILE SIZE (Ensures file isn't too large)
+  check_file_size:
+    name: 1. Check File Size
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check if file is too long (Max 5 lines)
+        id: line_check
+        run: |
+          # Use 'wc -l' to count lines in the root file 'Hello.txt'
+          LINE_COUNT=$(wc -l < Hello.txt)
+          echo "Current line count: $LINE_COUNT"
+          if [ $LINE_COUNT -gt 5 ]; then
+            echo "::error::The Hello.txt file has too many lines ($LINE_COUNT). Max allowed is 5."
+            exit 1 
+          fi
+
+  # CI STAGE 2: VERIFY CONTENT (Ensures a required keyword is present)
+  verify_content:
+    name: 2. Verify Content
+    runs-on: ubuntu-latest
+    needs: [check_file_size] # Must pass the first check
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for required keyword 'version'
+        run: |
+          # Use 'grep -q' to quietly search for the keyword 'version'
+          if ! grep -q "version" Hello.txt; then
+            echo "::error::The required keyword 'version' is missing from Hello.txt!"
+            exit 1 
+          fi
+          echo "Content check passed. 'version' keyword found."
+
+  # CD STAGE 3: PUBLISH (Simulates deployment)
+  publish_update:
+    name: 3. Publish Latest Update
+    runs-on: ubuntu-latest
+    needs: [verify_content] # Must pass all checks
+    steps:
+      - uses: actions/checkout@v4
+      - name: Simulate Publishing the final, validated file
+        run: |
+          echo "--- FINAL PUBLISHED MESSAGE ---"
+          cat Hello.txt
+          echo "-------------------------------"
+          echo "The latest Hello.txt has been automatically published to the staging environment!"
